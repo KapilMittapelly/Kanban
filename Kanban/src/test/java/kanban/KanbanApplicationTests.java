@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public class KanbanApplicationTests {
 
-	//Local comment
+	//Local comment 
 	@Test
 	public void contextLoads() {
 	}
