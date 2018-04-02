@@ -1,0 +1,117 @@
+<!doctype html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>Update Board</title>
+    <meta name="description" content="Update Board"/>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="css/main.css"/>
+    <link rel="stylesheet" href="css/menu.css"/>
+    <link rel="stylesheet" href="css/materialize.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="js/materialize.js"></script>
+</head>
+
+<body>
+
+    <div id='cssmenu'>
+        <ul>
+        	<li><a th:href="@{/newBoard}"><span>New board</span></a></li>
+            <li class="active"><a><span>Update board</span></a></li>
+            <li><a th:href="@{/myDashboard}"><span>Dashboard</span></a></li>
+            <li><a th:href="@{/myProfile}"><span>My Profile</span></a></li>
+            <li><a th:href="@{/logout}">Logout</a> </li>
+        </ul>
+    </div>
+
+	<div class="row center">
+		<form class="col s12 updateBoard" th:action="@{/updateBoard}" th:object="${board}" method="post" enctype="multipart/form-data">
+			<div class="row">
+				<div class="input-field col s12">
+					<input type="hidden" th:field="*{boardId}"/>
+					<label>Name</label>
+					<input type="text" th:field="*{boardName}" th:errorclass="error"/> 
+					<span th:if="${#fields.hasErrors('boardName')}" th:errors="*{boardName}" class="error">Invalid Name</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field col s12">
+					<label>Key</label>
+					<input type="text" maxlength="5" th:field="*{boardKey}" th:errorclass="error" /> 
+					<span th:if="${#fields.hasErrors('boardKey')}" th:errors="*{boardKey}" class="error">Invalid Key</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field col s12">
+					<label>Description</label>
+					<input type="text" th:field="*{boardDescription}" th:errorclass="error" /> 
+					<span th:if="${#fields.hasErrors('boardDescription')}" th:errors="*{boardDescription}" class="error">Invalid Description</span>
+				</div>
+			</div>
+			<div class="row marginBottom0">
+				<div class="input-field col s12 marginTop0 marginBottom20">
+					<button class="btn teal" type="submit" name="addUser" id="addUser">
+						Add User 
+						<i class="mdi-content-add left"></i>
+					</button>
+				</div>
+				<div class="row" th:each="row,rowStat : *{userBoards}">
+					<div class="input-field col s12 l4">
+						<label>User Id</label>
+						<input type="number" th:attrappend="readonly = ${LOGGED_IN_USER_ID} == *{userBoards[__${rowStat.index}__].userId} ? readonly " 
+							 th:field="*{userBoards[__${rowStat.index}__].userId}" th:errorclass="error" />
+						<span th:if="${#fields.hasErrors('userBoards[__${rowStat.index}__].userId')}" th:errors="*{userBoards[__${rowStat.index}__].userId}" class="error">Invalid User Id</span>
+					</div>
+					<div class="input-field col s12 l4">
+						<!-- th:attrappend="disabled = ${LOGGED_IN_USER_ID} == *{userBoards[__${rowStat.index}__].userId} ? disabled " -->
+						<select th:unless="${LOGGED_IN_USER_ID} == *{userBoards[__${rowStat.index}__].userId}"
+							th:field="*{userBoards[__${rowStat.index}__].accessLevel}" th:errorclass="error">
+							<option value="" disabled="disabled" selected="selected">Choose Role for User</option>
+							<option value="1">Read</option>
+							<option value="2">Update</option>
+							<option value="3">Create</option>
+						</select>
+						<label>User Role</label>
+						<input type="text" disabled="disabled" th:if="${LOGGED_IN_USER_ID} == *{userBoards[__${rowStat.index}__].userId}" value="Owner"/>
+						<span th:if="${#fields.hasErrors('userBoards[__${rowStat.index}__].accessLevel')}" th:errors="*{userBoards[__${rowStat.index}__].accessLevel}" class="error">Invalid Access level</span>
+						<input type="hidden" th:if="${LOGGED_IN_USER_ID} == *{userBoards[__${rowStat.index}__].userId}" th:field="*{userBoards[__${rowStat.index}__].accessLevel}"/>
+					</div>
+					<div class="input-field col s12 l4">
+						<button class="btn  red lighten-1" type="submit" name="removeUser" id="removeUser" th:value="${rowStat.index}"
+							th:attrappend="disabled = ${LOGGED_IN_USER_ID} == *{userBoards[__${rowStat.index}__].userId} ? disabled ">
+							Remove 
+							<i class="mdi-action-delete right waves-effect"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field col s12 l4 marginTop0OnLarge">
+					<button class="btn waves-effect waves-light" type="submit" id="update" name="update">Update</button>
+				</div>
+				<div class="input-field col s12 l4 marginTop0OnLarge">
+					<button class="btn  red lighten-1" disabled="disabled" type="submit" name="archive" id="archive">
+						Archive
+						<i class="fa fa-archive" style="font-size:20px"></i>
+					</button>
+				</div>
+				<div class="input-field col s12 l4 marginTop0OnLarge">
+					<button class="btn  red lighten-1" type="submit" name="delete" id="delete">
+						Delete
+						<i class="fa fa-trash" style="font-size:20px"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	
+	<script>
+		$(document).ready(function() {
+	    	$('select').material_select();
+	  	});
+	</script>
+
+</body>
+</html>

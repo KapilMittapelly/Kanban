@@ -1,0 +1,272 @@
+html {
+	line-height: normal;
+	color: #e75854;
+	font: 17px/1.4 'Open Sans', sans-serif;
+	text-align: center;
+}
+
+body {
+	margin: 0;
+}
+
+.container {
+	margin: 0 auto;
+	max-width: 760px;
+	padding: 0 10px;
+}
+
+.main-content {
+	padding: 4em 0 6em;
+}
+
+h1 {
+	font-size: 3em;
+	line-height: 1.2em;
+	margin: 0 .5em .75em;
+}
+
+h2 {
+	font-size: 2em;
+	margin: 0 0 10px 0;
+}
+
+.main-content .description {
+	color: #ddd;
+	font-size: 1.2em;
+	margin: 1em 2em 0;
+}
+
+.marginTop0 {
+	margin-top: 0px;
+}
+
+@media only screen and (min-width: 993px) {
+	.marginTop0OnLarge {
+		margin-top: 0px;
+	}	
+}
+
+.marginBottom0 {
+	margin-bottom: 0px;
+}
+
+.marginTop20 {
+	margin-top: 20px;
+}
+
+.marginBottom20 {
+	margin-bottom: 20px;
+}
+
+.site-section {
+	background-color: #f9f9f9;
+	color: #333;
+	overflow: hidden;
+	padding: 2em 0 6em;
+}
+
+.image {
+	width: 100%;
+	max-width: 100%;
+	height: auto;
+}
+
+.alignLeft {
+	text-align: left;
+}
+
+.alignRight {
+	text-align: right;
+}
+
+.alignCenter {
+	text-align: center;
+}
+
+.right {
+    position: absolute;
+    right: 20px;
+}
+
+input[type=text], input[type=number] {
+	color: #fff;
+}
+
+.morph-content h2 {
+	color: #e75854;
+}
+
+.kanban-section {
+	margin: 60px auto;
+	padding-top: 0;
+	border-top: 2px solid #e5e5e5;
+	text-align: left;
+	color: #2f3135;
+}
+
+.kanban-page {
+	text-align: left;
+	color: #2f3135;
+}
+
+.kanban-section h2 {
+	color: #e75854;
+}
+
+div.content-style-form div.error, div.content-style-form label.error,
+	div.content-style-form p.error {
+	margin: 0px;
+	padding: 0px;
+	color: #e75854;
+	letter-spacing: 0px;
+	/* font-size: 0.7em; */
+}
+
+div.content-style-form div.error label {
+	color: #e75854;
+}
+
+.content-style-form button.error {
+	margin-top: 1em;
+}
+
+div.content-style-form input.error {
+	border-color: #e75854;
+	color: #e75854;
+}
+
+.content-style-form input[type="text"].readonly, .content-style-form input[type="email"].readonly
+	{
+	border-color: transparent;
+}
+
+.hide {
+	display: none !important;
+}
+
+.center {
+	margin: auto;
+	width: 50%;
+}
+
+.button {
+	background: #e75854;
+}
+
+#addButton {
+	background: url(../icon/add.png);
+	border: none;
+	width: 40px;
+	height: 35px;
+	background-repeat: no-repeat;
+	outline: none;
+}
+
+.full-width {
+	width: 100%;
+}
+
+.alignLeft {
+	text-align: left;
+}
+
+div.relative {
+	position: relative;
+}
+
+div.absolute {
+	position: absolute;
+	left: 0px;
+	width: 35px;
+	height: 35px;
+}
+
+*, *:after, *:before {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+div.content-style-form h2.medium {
+	font-size: 2.5em;
+}
+
+.margin-auto {
+	margin: auto;
+}
+
+div.post-content a {
+	color: #fff;
+	font-weight: bold;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+form.newBoard, form.updateBoard, form.updateItem {
+	text-align: left;;
+}
+
+form div.input-field input.error, textarea.error {
+	margin: 0px;
+}
+
+form div.input-field span.error {
+	font-size: .8rem;
+	line-height: normal;
+    color: #e75854;
+    text-align: left;
+}
+
+.kanban-page ul.side-nav {
+	background: #2f3135;
+	color: #fff
+}
+
+ul.side-nav div.row form.updateItem {
+	line-height: normal;
+}
+
+.close-button {
+	position: relative;
+    right: 15px;
+	float: right;
+	width: 1.5rem;
+	line-height: 1.5rem;
+	text-align: center;
+	cursor: pointer;
+	border-radius: 0.25rem;
+	font-weight: 1000;
+}
+
+.close-button:hover {
+	background-color: #e75854;
+}
+
+.select-wrapper.disabled + label,
+input[type=number]:not(.browser-default):disabled,
+input[type=number]:not(.browser-default)[readonly="readonly"],
+.select-wrapper input.select-dropdown:disabled,
+input[type=text]:not(.browser-default):disabled {
+	color: #9e9e9e;	
+}
+
+.select-wrapper span.caret {
+	color: #fff;
+}
+
+.switch label input[type=checkbox]:checked + .lever,
+.switch label input[type=checkbox]:checked + .lever:after {
+	background-color: #e75854;
+}
+
+/*
+.bg-image {
+    background-image: url(../img/kanban-board-e60650d1-1.jpg);
+    background-repeat: no-repeat;
+}*/
+
+/** {
+    transition: all 1s;
+}*/

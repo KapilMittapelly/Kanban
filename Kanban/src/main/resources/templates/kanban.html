@@ -1,0 +1,394 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <title>Kanban</title>
+    <meta name="description" content="Kanban Board"/>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link type="text/css" rel="stylesheet" href="css/main.css"/>
+    <link type="text/css" rel="stylesheet" href="css/menu.css"/>
+    <!-- <link rel="stylesheet" href="css/component.css" />
+    <link rel="stylesheet" href="css/content.css" /> -->
+    <link type="text/css" rel="stylesheet" href="css/materialize.css"/>
+    <link type="text/css" rel="stylesheet" href="css/kanban.css"/>
+    <link type="text/css" rel="stylesheet" href="css/app.css"/>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="js/materialize.js"></script>
+    <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+    <script th:inline="javascript">
+		/*<![CDATA[*/
+			let items = /*[[${items}]]*/ undefined;
+			const access_level = /*[[${ACCESS_LEVEL}]]*/ 1;
+			const add_Operation = /*[[${Add_Operation}]]*/ false;
+			const boardKey = /*[[${BOARD_KEY}]]*/ "";
+			let enableDrag = false;
+			if(access_level > 1) {
+				enableDrag = true;
+			}
+		/*]]>*/
+	</script>
+	<script src="js/app.js"></script>
+</head>
+
+<body class="kanban-page">
+
+    <div id='cssmenu'>
+        <ul>
+        	<li th:if="${ACCESS_LEVEL} != null and ${ACCESS_LEVEL} > 2">
+        		<a href="#" id="addItem" data-activates="slide-out" class="button-collapse underline">Add Item</a>
+        	</li>
+            <!-- <li><a th:href="@{/newBoard}"><span>New board</span></a></li> -->
+            <li><a th:href="@{/myDashboard}"><span>Dashboard</span></a></li>
+            <li class="active"><a><span>Kanban</span></a></li>
+            <li><a th:href="@{/myProfile}"><span>My Profile</span></a></li>
+            <li class=""><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </div>
+
+    <section class="kanban-section">
+		<div class="row full-width">
+			<div class="col s12 m6">
+				<h2 class="section-title">
+	        		<span th:text="${BOARD_NAME}">Kanban Board</span>
+	        	</h2>
+        	</div>
+        	<div class="col s12 m6">
+        		<div class="switch right">
+				    <label>
+				      All
+				      <input type="checkbox" name="assignedToMe" th:attrappend="checked = ${assignedToMe} == true ? checked "/>
+				      <span class="lever"></span>
+				      Assigned to me
+				    </label>
+  				</div>
+        	</div>
+		</div>
+        
+        <div class="row full-width">
+        	<ul id="slide-out" class="side-nav full-width">
+        		<li>
+        			<div class="col m2 l3"></div>
+        			<div class="col s12 m8 l6 center content-style-form">
+        				<div class="row">
+	        				<div class="col s12 marginTop20">
+	        					<span class="close-button">&times;</span>
+	                        	<h2 data-operation='Update' class="medium">Update Item</h2>
+	                        	<h2 data-operation='Add' class="medium hide">Add Item</h2>
+	        				</div>
+							<form class="col s12 updateItem" id="addOrUpdateForm" th:action="@{/addItem}" th:object="${item}" method="post">
+								<div class="row">
+									<div class="input-field col s12">
+	                            		<input type="hidden" th:field="*{boardId}"/>
+	                            		<input type="hidden" th:field="*{itemId}"/>
+	                            		<input type="hidden" th:field="*{sequenceNum}"/>
+	                            		<input type="hidden" th:field="*{status}"/>
+	                            		<input type="hidden" th:field="*{updateUser}"/>
+	                            		<label class="form-label">Item Summary</label>
+	                            		<input type="text" th:field="*{itemSummary}" th:errorclass="error" />
+	                            		<span th:if="${#fields.hasErrors('itemSummary')}" th:errors="*{itemSummary}" class="error">Invalid Summary</span>
+	                            	</div>
+	                            </div>
+	                            <div class="row">
+	                            	<div class="input-field col s12">
+	                                	<label class="form-label">Item Description</label>
+	                                	<textarea class="materialize-textarea" style="padding:0px; line-height:20px;" th:field="*{itemDescription}" th:errorclass="error" ></textarea>
+	                                	<!-- <input type="text" th:field="*{itemDescription}" th:errorclass="error" /> -->
+	                                	<span th:if="${#fields.hasErrors('itemDescription')}" th:errors="*{itemDescription}" class="error">Invalid Description</span>
+	                            	</div>
+	                            </div>
+	                            <div class="row">
+	                            	<div class="input-field col s12 l6">
+										<select th:field="*{priority}" th:errorclass="error">
+											<option value="0" disabled="disabled" selected="selected">Choose Priority</option>
+											<option value="1">High</option>
+											<option value="2">Medium</option>
+											<option value="3">Low</option>
+										</select>
+										<label>Item Priority</label>
+										<span th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}" class="error">Invalid Priority</span>
+									</div>
+									<div class="input-field col s12 l6">
+	                                	<label class="form-label">Assign To</label>
+	                                	<input type="number" th:field="*{assignedUser}" th:errorclass="error" />
+	                                	<span th:if="${#fields.hasErrors('assignedUser')}" th:errors="*{assignedUser}" class="error">Invalid User Id</span>
+	                            	</div>
+	                            </div>
+	                            <div class="row">
+	                            	<div class="input-field col s12 l6">
+	                                	<label class="form-label">JIRA Number</label>
+	                                	<input type="text" th:field="*{jiraNum}" th:errorclass="error" />
+	                                	<span th:if="${#fields.hasErrors('jiraNum')}" th:errors="*{jiraNum}" class="error">Invalid JIRA Number</span>
+	                            	</div>
+	                            	<div class="input-field col s12 l6">
+	                                	<label class="form-label">Due Date</label>
+	                                	<input type="text" class="datepicker" th:field="*{dueDate}" th:errorclass="error" />
+	                                	<span th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}" class="error">Invalid Due Date</span>
+	                            	</div>
+	                            </div>
+	                            <div class="col s6">
+		                            <div data-operation='Update' class="row udpate">
+		                            	<div class="input-field col s12 l6">
+			                                <button class="btn waves-effect waves-light" type="submit" id="update" name="update">Update Item</button>
+		                            	</div>
+		                            </div>
+		                            <div data-operation='Add' class="row hide">
+		                            	<div class="input-field col s12 l6">
+			                                <button class="btn waves-effect waves-light" type="submit" id="add" name="add">Add Item</button>
+		                            	</div>
+		                            </div>
+	                            </div>
+	                            <div class="col s6" th:if="${ACCESS_LEVEL} != null and ${ACCESS_LEVEL} > 3">
+	                            	<div class="row">
+			                            <div class="input-field col s12">
+											<button class="btn  red lighten-1" type="submit" name="delete" id="delete">
+											Delete
+											<i class="fa fa-trash" style="font-size:20px"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+	                        </form>
+	                        <div class="error" th:if="${#fields.hasErrors('${item.*}')}">
+								<script>
+									clearFlag = false;
+									$(document).ready(function() {
+										if(add_Operation) {
+											$('#addItem').sideNav('show');	
+										} else {
+											$('a#' + $('#itemId').val()).sideNav('show');
+										}
+									});
+								</script>
+							</div>
+                        </div>
+					</div>
+					<div class="col m2 l3"></div>
+				</li>
+			</ul>
+		</div>
+        
+        <!-- <div th:if="${ACCESS_LEVEL} == 3" class="morph-button morph-button-modal morph-button-modal-5 morph-button-fixed full-width alignLeft absolute">
+        	<button type="button" id="addButton"></button>
+        	<div class="morph-content">
+        		<div>
+        			<div class="content-style-form content-style-form-1">
+        				<span class="icon icon-close">Close the dialog</span>
+                        <h2 class="medium">Add Item</h2>
+						<div class="error" th:if="${#fields.hasErrors('${item.*}')}">
+							<script>
+								forceClick('addButton');
+							</script>
+						</div>
+						<form th:action="@{/addItem}" th:object="${item}" method="post">
+							<p>
+                            	<input type="hidden" th:field="*{boardId}"/>
+                            	<input type="hidden" th:field="*{updateUser}"/>
+                            	<label>Item Summary</label>
+                            	<input type="text" th:field="*{itemSummary}" th:errorclass="error" />
+                            	<label th:if="${#fields.hasErrors('itemSummary')}" th:errors="*{itemSummary}" class="error">Invalid Summary</label>
+                            </p>
+                            <p>
+                                <label>Item Description</label>
+                                <input type="text" th:field="*{itemDescription}" th:errorclass="error" />
+                                <label th:if="${#fields.hasErrors('itemDescription')}" th:errors="*{itemDescription}" class="error">Invalid Description</label>
+                            </p>
+                            <p>
+                            	<label>Item Priority</label>
+								<select th:field="*{priority}" th:errorclass="error">
+									<option value="0" disabled="disabled" selected="selected">Choose Priority</option>
+									<option value="1">High</option>
+									<option value="2">Medium</option>
+									<option value="3">Low</option>
+								</select>
+								<label th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}" class="error">Invalid Priority</label>
+							</p>
+							<p>
+                                <label>Assign To</label>
+                                <input type="text" th:field="*{assignedUser}" th:errorclass="error" />
+                                <label th:if="${#fields.hasErrors('assignedUser')}" th:errors="*{assignedUser}" class="error">Invalid User Id</label>
+                            </p>
+                            <p>
+                                <label>JIRA Number</label>
+                                <input type="text" th:field="*{jiraNum}" th:errorclass="error" />
+                                <label th:if="${#fields.hasErrors('jiraNum')}" th:errors="*{jiraNum}" class="error">Invalid JIRA Number</label>
+                            </p>
+                            <p>
+                                <label>Due Date</label>
+                                <input type="date" th:field="*{dueDate}" th:errorclass="error" />
+                                <label th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}" class="error">Invalid Due Date</label>
+                            </p>
+                            <p>
+                                <button id="addItem" name="addItem" type="submit">Add Item</button>
+                            </p>
+                        </form>
+					</div>
+				</div>
+			</div>
+		</div> -->
+		
+        <div class="board">
+        	<div class="board-column backlog">
+                <div class="board-column-header" th:if="${backlog} != null" th:text="'Backlog (' + ${#lists.size(backlog)} + ')'">Backlog</div>
+                <div class="board-column-content" data-column="backlog">
+                    <div class="board-item" data-item="backlog" th:each="item: *{backlog}" 
+                    	th:attr="data-priority=${item.getPriorityAsString()}" th:id="${item.boardId + '_' + item.itemId + '_' + item.sequenceNum}">
+                        <div class="board-item-content">
+                        	<a href="#" th:id="${item.itemId}" data-activates="slide-out" class="button-collapse underline" th:text="${BOARD_KEY} + '-' + ${item.itemId}">#</a>
+                        	<br/>
+                        	<span th:text="*{item.itemSummary}">Item #</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="board-column todo">
+                <div class="board-column-header" th:if="${todo} != null" th:text="'To do (' + ${#lists.size(todo)} + ')'">To do</div>
+                <div class="board-column-content" data-column="todo">
+                    <div class="board-item" data-item="todo" th:each="item: *{todo}" 
+                    	 th:attr="data-priority=${item.getPriorityAsString()}" th:id="${item.boardId + '_' + item.itemId + '_' + item.sequenceNum}">
+                        <div class="board-item-content">
+                        	<a href="#" th:id="${item.itemId}" data-activates="slide-out" class="button-collapse underline" th:text="${BOARD_KEY} + '-' + ${item.itemId}">#</a>
+                        	<br/>
+                        	<span th:text="*{item.itemSummary}">Item #</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="board-column working">
+                <div class="board-column-header" th:if="${wip} != null" th:text="'Work In Progress (' + ${#lists.size(wip)} + ')'">Work In Progress</div>
+                <div class="board-column-content" data-column="wip">
+                    <div class="board-item" data-item="wip" th:each="item: *{wip}" 
+                    	th:attr="data-priority=${item.getPriorityAsString()}" th:id="${item.boardId + '_' + item.itemId + '_' + item.sequenceNum}">
+                        <div class="board-item-content">
+                        	<a href="#" th:id="${item.itemId}" data-activates="slide-out" class="button-collapse underline" th:text="${BOARD_KEY} + '-' + ${item.itemId}">#</a>
+                        	<br/>
+                        	<span th:text="*{item.itemSummary}">Item #</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="board-column done">
+                <div class="board-column-header" th:if="${done} != null" th:text="'Done (' + ${#lists.size(done)} + ')'">Done</div>
+                <div class="board-column-content" data-column="done">
+                    <div class="board-item" data-item="done" th:each="item: *{done}" 
+                    	th:attr="data-priority=${item.getPriorityAsString()}" th:id="${item.boardId + '_' + item.itemId + '_' + item.sequenceNum}">
+                        <div class="board-item-content">
+                        	<a href="#" th:id="${item.itemId}" data-activates="slide-out" class="button-collapse underline" th:text="${BOARD_KEY} + '-' + ${item.itemId}">#</a>
+                        	<br/>
+                        	<span th:text="*{item.itemSummary}">Item #</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+	
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.3.1/web-animations.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/muuri/0.5.3/muuri.min.js"></script>
+
+	<script src="js/slideout.js"></script>
+    <script src="js/newkanban.js"></script>
+
+    <script src="js/classie.js"></script>
+    <script src="js/uiMorphingButton_fixed.js"></script>
+    
+    <script>
+		$(document).ready(function() {
+	    	$('select').material_select();
+	  	});
+	</script>
+    <script>
+    
+    	$(document).ready(function(){
+        	$('.datepicker').pickadate({
+        		selectMonths: true, // Creates a dropdown to control month
+       		    selectYears: 15, // Creates a dropdown of 15 years to control year,
+       		    today: 'Today',
+       		    clear: 'Clear',
+       		    close: 'Ok',
+       		    closeOnSelect: true, // Close upon selecting a date,
+       		    container: undefined, // ex. 'body' will append picker to body
+   		   	});
+      	});
+        
+        $('.close-button').click(hidePanel);
+        
+        
+    </script>
+    
+ <!--    <script>
+        (function() {
+            var docElem = window.document.documentElement,
+                didScroll, scrollPosition;
+
+            // trick to prevent scrolling when opening/closing button
+            function noScrollFn() {
+                window.scrollTo(scrollPosition ? scrollPosition.x : 0, scrollPosition ? scrollPosition.y : 0);
+            }
+
+            function noScroll() {
+                window.removeEventListener('scroll', scrollHandler);
+                window.addEventListener('scroll', noScrollFn);
+            }
+
+            function scrollFn() {
+                window.addEventListener('scroll', scrollHandler);
+            }
+
+            function canScroll() {
+                window.removeEventListener('scroll', noScrollFn);
+                scrollFn();
+            }
+
+            function scrollHandler() {
+                if (!didScroll) {
+                    didScroll = true;
+                    setTimeout(function() {
+                        scrollPage();
+                    }, 60);
+                }
+            };
+
+            function scrollPage() {
+                scrollPosition = {
+                    x: window.pageXOffset || docElem.scrollLeft,
+                    y: window.pageYOffset || docElem.scrollTop
+                };
+                didScroll = false;
+            };
+
+            scrollFn();
+
+            [].slice.call(document.querySelectorAll('.morph-button')).forEach(function(bttn) {
+                new UIMorphingButton(bttn, {
+                    closeEl: '.icon-close',
+                    onBeforeOpen: function() {
+                        // don't allow to scroll
+                        noScroll();
+                    },
+                    onAfterOpen: function() {
+                        // can scroll again
+                        canScroll();
+                    },
+                    onBeforeClose: function() {
+                        // don't allow to scroll
+                        noScroll();
+                    },
+                    onAfterClose: function() {
+                        // can scroll again
+                        canScroll();
+                    }
+                });
+            });
+
+        })();
+
+    </script> -->
+
+</body>
+
+</html>

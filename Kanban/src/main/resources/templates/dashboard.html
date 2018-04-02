@@ -1,0 +1,110 @@
+<!doctype html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <title>Dashboard</title>
+    <meta name="description" content="Dashboard"/>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="css/main.css"/>
+    <link rel="stylesheet" href="css/menu.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link type="text/css" rel="stylesheet" href="css/dashboard.css"/>
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    
+</head>
+
+<body>
+
+    <div id='cssmenu'>
+        <ul>
+        	<li><a th:href="@{/newBoard}"><span>New board</span></a></li>
+            <li class="active"><a href='#'><span>Dashboard</span></a></li>
+            <li><a th:href="@{/myProfile}"><span>My Profile</span></a></li>
+            <li><a th:href="@{/logout}">Logout</a> </li>
+        </ul>
+    </div>
+    
+    <div class="layout">
+
+        <main class="main">
+            <div class="scroller posts">
+                <article class="card post" th:each="userboard : *{userboards}">
+                    <div class="post-content relative">
+                    	<a th:if="${userboard.accessLevel} == 4" class="right" th:href="@{/updateBoard(boardId=${userboard.boardDto.boardId},userId=${userboard.userId})}">
+                       		<i class="fa fa-edit" style="font-size:24px"></i>
+						</a>
+                        <div class="post-text-content" th:switch="${userboard.accessLevel}">
+                        	<!-- <a class="margin-auto" th:case="1" th:text="*{userboard.boardDto.boardName}"></a> -->
+                        	<a class="margin-auto" th:case="*" th:href="@{/kanban(boardId=${userboard.boardDto.boardId},userId=${userboard.userId})}" th:text="*{userboard.boardDto.boardName}"></a>
+                            <canvas th:id="'myChart' + ${userboardStat.index}" width="100" height="50"></canvas>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <script th:inline="javascript" type="text/javascript">
+            /*<![CDATA[*/
+            	var userboards = /*[[${userboards}]]*/;
+            	$.each(userboards, function (index, userboard) {
+            	    //console.log(index + ':' + userboard.accessLevel);
+            	    
+            	    var ctx = document.getElementById('myChart' + index).getContext('2d');
+            	    var chart = new Chart(ctx, {
+                        // The type of chart we want to create
+                        type: 'pie',
+                        data: {
+                            labels: ["Backlog", "Todo", "Doing", "Done"],
+                            datasets: [{
+                            	label: userboard.boardDto.boardName,
+                                backgroundColor: ["#f9944a", "#4A9FF9", "#ffcc66", "#2ac06d"],
+                                data: calculateItems(userboard.boardDto.items)
+                    }]
+                        },
+                        options: {
+                            title: {
+                                display: false,
+                                text: userboard.boardDto.boardName
+                            }
+                        }
+
+                    });
+            	});
+            	
+            	function calculateItems(items) {
+            		
+            		if(!items || items.length == 0) {
+            			return [];
+            		} else {
+            			var backlog = 0, todo = 0, wip = 0, done = 0;
+                		$.each(items, function (index, item) {
+                			console.log(item.status);
+                			if(item.status) {
+                				switch(item.status) {
+                					case 1:
+                						backlog++;
+                						break;
+                					case 2:
+                						todo++;
+                						break;
+                					case 3:
+                						wip++;
+                						break;
+                					case 4:
+                						done++;
+                						break;
+                				}
+                			}
+                		});
+                		console.log([backlog, todo, wip, done]);
+                		return [backlog, todo, wip, done]; 	
+            		}
+            	}
+                /*]]>*/
+            </script>
+        </main>
+    </div>
+
+</body>
+</html>
